@@ -18,7 +18,7 @@ public class Spambot extends TelegramLongPollingBot {
 	public Spambot()
 	{
 		super();
-		config = new File("config.txt");
+		config = new File("/home/david/Documents/GitHub/Telegram-Spambot/config.txt");
 		try {
 			reader = new Scanner(config);
 			user = reader.next();
@@ -42,16 +42,16 @@ public class Spambot extends TelegramLongPollingBot {
 		
 		if(message.equals("!status"))
 		{
-    		SendMessage status = new SendMessage() // Create a SendMessage object with mandatory fields
+			SendMessage status = new SendMessage() // Create a SendMessage object
                     .setChatId(update.getMessage().getChatId())
                     .setText("Ready to spam the everliving shit out of someone you hate...");
-            try {
-                sendMessage(status); //Call method to send the message
-                System.out.println("Message sent out at " + LocalDateTime.now());
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-    	}
+			try {
+				sendMessage(status); //Call method to send the message
+				System.out.println("Message sent out at " + LocalDateTime.now());
+			} catch (TelegramApiException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@Override
