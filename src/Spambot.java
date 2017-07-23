@@ -18,12 +18,13 @@ public class Spambot extends TelegramLongPollingBot {
 	public Spambot()
 	{
 		super();
-		config = new File("/home/david/Documents/GitHub/Telegram-Spambot/config.txt");
 		try {
+			config = new File("/home/david/Documents/GitHub/Telegram-Spambot/config.txt");
 			reader = new Scanner(config);
 			user = reader.next();
 			token = reader.next();
 		} catch(FileNotFoundException e) {
+			System.out.println("Could not read or locate the config file.");
 			e.printStackTrace();
 		}
 	}
@@ -35,11 +36,13 @@ public class Spambot extends TelegramLongPollingBot {
 		
 		String message = "";
 		
+		// Get the message from the update object
 		if(update.hasMessage())
 		{
 			message = update.getMessage().getText().toLowerCase();
 		}
 		
+		// Check for if the bot is alive
 		if(message.equals("!status"))
 		{
 			SendMessage status = new SendMessage() // Create a SendMessage object
@@ -51,6 +54,11 @@ public class Spambot extends TelegramLongPollingBot {
 			} catch (TelegramApiException e) {
 				e.printStackTrace();
 			}
+		}
+
+		if(message.equals("!Spam"))
+		{
+			// TODO: Add timed messages on a loop that can be stopped by another message
 		}
 	}
 	
