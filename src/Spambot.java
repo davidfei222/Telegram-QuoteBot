@@ -55,8 +55,10 @@ public class Spambot extends TelegramLongPollingBot {
 				e.printStackTrace();
 			}
 		}
-
-		if(message.equals("!Spam"))
+		
+		String[] words = message.split(" ");
+		// TODO: Add a regex comparison for userIDs
+		if(words[0] == "!spam" && words[1] == "") // TODO: Add a regex comparison for userIDs
 		{
 			// TODO: Add timed messages on a loop that can be stopped by another message
 		}
