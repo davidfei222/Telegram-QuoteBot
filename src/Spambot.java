@@ -19,7 +19,7 @@ public class Spambot extends TelegramLongPollingBot {
 	{
 		super();
 		try {
-			config = new File("/home/david/Documents/GitHub/Telegram-Spambot/config.txt");
+			config = new File("/home/david/Documents/GitHub/Telegram-QuoteBot/config.txt");
 			reader = new Scanner(config);
 			user = reader.next();
 			token = reader.next();
