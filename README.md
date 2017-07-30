@@ -1,2 +1,2 @@
-# Telegram-Spambot
-A spambot to be used against Matt when he abuses his power in the Telegram group.
+# Telegram-QuoteBot
+A bot that keeps a list of quotes of people in the group chat and messages the group with a random one every morning and afternoon.
