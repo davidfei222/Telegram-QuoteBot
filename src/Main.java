@@ -11,7 +11,7 @@ public class Main
 		TelegramBotsApi botsApi = new TelegramBotsApi();
 		
 		try {
-			botsApi.registerBot(new Spambot());
+			botsApi.registerBot(new QuoteBot());
 	        System.out.println("Bot logged in at " + LocalDateTime.now());
 	    } catch (TelegramApiException e) {
 	        e.printStackTrace();
