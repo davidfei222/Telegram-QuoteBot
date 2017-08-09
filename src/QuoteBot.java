@@ -12,13 +12,13 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 
 public class QuoteBot extends TelegramLongPollingBot {
-	
+
 	// These variables are for reading config.txt
 	private String workingDir;
 	private File config;
 	private String user;
 	private String token;
-	
+
 	public QuoteBot()
 	{
 		super();
@@ -34,17 +34,17 @@ public class QuoteBot extends TelegramLongPollingBot {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
-	public void onUpdateReceived(Update update) 
+	public void onUpdateReceived(Update update)
 	{
 		System.out.println("Update received at " + LocalDateTime.now());
-		
+
 		Message messageObj;
 		User sayer = null;
 		Chat chat = null;
 		String message = "";
-		
+
 		// Get the message from the update object
 		if(update.hasMessage())
 		{
@@ -53,7 +53,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 			sayer = messageObj.getForwardFrom();
 			message = update.getMessage().getText();
 		}
-		
+
 		// Check for if the bot is alive
 		if(message.equals("!status"))
 		{
@@ -97,15 +97,15 @@ public class QuoteBot extends TelegramLongPollingBot {
 			}
 		}
 	}
-	
+
 	@Override
-	public String getBotUsername() 
+	public String getBotUsername()
 	{
 		return user;
 	}
 
 	@Override
-	public String getBotToken() 
+	public String getBotToken()
 	{
 		return token;
 	}
