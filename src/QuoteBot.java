@@ -85,7 +85,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 		// TODO: File I/O stuff (try to open file, but if it doesn't exist create it and write to it
 		if(null != sayer && null != chat)
 		{
-			File quotefile = new File(workingDir + "quotes/" + chat.toString());
+			File quotefile = new File(workingDir + "quotes/" + chat.getTitle());
 			if (!quotefile.exists())
 			{
 				try {
