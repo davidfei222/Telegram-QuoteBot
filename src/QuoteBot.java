@@ -44,17 +44,24 @@ public class QuoteBot extends TelegramLongPollingBot {
 		System.out.println("Update received at " + LocalDateTime.now());
 
 		Message messageObj;
-		User forwarder = null;
+		User sayer = null;
 		Chat chat = null;
 		String message = "";
+		String name = "";
+		long chatid = 0;
 
 		// Get the message from the update object
 		if(update.hasMessage())
 		{
 			messageObj = update.getMessage();
-			chat = messageObj.getChat();
-			forwarder = messageObj.getForwardFrom();
 			message = update.getMessage().getText();
+			chat = messageObj.getChat();
+			chatid = chat.getId();	
+			sayer = messageObj.getForwardFrom();
+			if (null != sayer)
+			{
+				name = sayer.getUserName();
+			}
 		}
 
 		// Check for if the bot is alive
@@ -86,20 +93,23 @@ public class QuoteBot extends TelegramLongPollingBot {
 			// System.out.println(quote);
 		}*/
 		// TODO: File I/O stuff (try to open file, but if it doesn't exist create it and write to it)	
-		if(null != forwarder && null != chat)
+		if(null != sayer && null != chat)
 		{
-			addQuote(chat, message);
+			addQuote(chatid, message, name);
 		}
 	}
 	
 	/**
 	 * A private helper method for adding a new quote to the record.
 	 * 
-	 * @param	chat	The chat object that the message originated from.
+	 * @param	id		The ID of the chat that the message originated from.
+	 * @param	message		The message to be quoted.
+	 * @param	name	The name of the person being quoted.
 	 */
-	private void addQuote(Chat chat, String message)
+	private void addQuote(long id, String message, String name)
 	{
-		String filepath = workingDir + "quotes/" + chat.getTitle();
+		System.out.println("Adding quote from chat" + id);
+		String filepath = workingDir + "quotes/" + id;
 		File quotefile = new File(filepath);
 		if (!quotefile.exists())
 		{
@@ -112,8 +122,9 @@ public class QuoteBot extends TelegramLongPollingBot {
 		}
 		try {
 			Writer quoteWriter = new BufferedWriter(new FileWriter(filepath, true));
-			quoteWriter.append(message + "\n");
+			quoteWriter.append(name + "\t" + message + "\n");
 			quoteWriter.close();
+			System.out.println("Successfully add quote from chat" + id);
 		} catch (IOException e) {
 			System.out.println("Failed to open quote file for writing.");
 			e.printStackTrace();
