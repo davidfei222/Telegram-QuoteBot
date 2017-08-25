@@ -100,7 +100,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 	}
 	
 	/**
-	 * A private helper method for adding a new quote to the record.
+	 * Adds a new quote to the record for the specified group.
 	 * 
 	 * @param	id		The ID of the chat that the message originated from.
 	 * @param	message		The message to be quoted.
@@ -129,6 +129,15 @@ public class QuoteBot extends TelegramLongPollingBot {
 			System.out.println("Failed to open quote file for writing.");
 			e.printStackTrace();
 		}
+		
+	}
+	
+	/**
+	 * Retrieves a quote for the record from the specified group and sends a message with it.
+	 * 
+	 */
+	private void sendQuote()
+	{
 		
 	}
 
