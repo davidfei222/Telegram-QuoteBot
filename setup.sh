@@ -12,6 +12,6 @@ else
 fi
 
 echo "Compiling code for the bot..."
-cd ~/Documents/GitHub/Telegram-QuoteBot/src
-javac -cp ~/Documents/GitHub/Telegram-QuoteBot/lib/telegrambots-2.4.4.5-jar-with-dependencies.jar:. Main.java
-#java -cp ~/Documents/GitHub/Telegram-QuoteBot/lib/telegrambots-2.4.4.5-jar-with-dependencies.jar:. Main
+cd "$HOME/Documents/GitHub/Telegram-QuoteBot/src"
+javac -cp "$HOME/Documents/GitHub/Telegram-QuoteBot/lib/telegrambots-3.6-jar-with-dependencies.jar":. Main.java
+#java -cp "$HOME/Documents/GitHub/Telegram-QuoteBot/lib/telegrambots-2.4.4.5-jar-with-dependencies.jar":. Main
