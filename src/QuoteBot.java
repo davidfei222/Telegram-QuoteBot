@@ -13,7 +13,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 public class QuoteBot extends TelegramLongPollingBot {
 
 	// These variables are for reading config.txt
-	private String confDir = "/home/david/Documents/";
+	private String configFile = "/home/david/.Telegram-QuoteBot/config";
 	private File config;
 	private String user;
 	private String token;
@@ -22,7 +22,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 	{
 		super();
 		try {
-			config = new File(confDir + "config.txt");
+			config = new File(configFile);
 			Scanner reader = new Scanner(config);
 			user = reader.next();
 			token = reader.next();
