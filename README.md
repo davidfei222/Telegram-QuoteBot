@@ -1,2 +1,2 @@
 # Telegram-QuoteBot
-A bot that keeps a list of quotes of people in the group chat and messages the group with a random one every morning and afternoon.
+A bot that keeps a record of memorable quotes of people in a Telegram group chat.  New quotes are added to the database by users messaging them to the bot.
