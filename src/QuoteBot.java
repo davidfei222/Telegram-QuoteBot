@@ -14,8 +14,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 public class QuoteBot extends TelegramLongPollingBot {
 
 	// Configuration variables
-	private String configFile = System.getenv("HOME") + "/.Telegram-QuoteBot/config";
-	private File config;
+	private static String configFile = System.getenv("HOME") + "/.Telegram-QuoteBot/config";
 	private String user;
 	private String token;
 	private String statusmsg;
@@ -29,7 +28,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 		super();
 		try {
 			// Parse the config file for things needed to run the bot.
-			config = new File(configFile);
+			File config = new File(configFile);
 			Scanner reader = new Scanner(config);
 			HashMap<String, String> confMap = new HashMap<String, String>(7);
 			String line;
@@ -94,7 +93,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 		
 		// Personal commands for my own use.
 		if (t_user.getId() == 275215669) {
-			
+			// TODO: Implement special commands that only I can use
 		}
 		
 	}
@@ -104,7 +103,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 	 */
 	public void addQuote(Quote quote)
 	{
-		
+		// TODO: Implement writing quotes to the database
 	}
 
 	@Override
