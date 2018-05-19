@@ -8,7 +8,7 @@ if [ -e $config ]; then
 else
 	echo "Config file not found.  Creating new config file at $config..."
 	mkdir -p "$HOME/.Telegram-QuoteBot/"
-	echo -e "User:\nToken:\nStatusMessage:\nDB:\nDBuser:\nDBpass:\nTables:" > "$config"
+	cp ./config_template $config
 fi
 
 echo "Compiling code for the bot..."

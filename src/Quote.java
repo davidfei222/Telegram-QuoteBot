@@ -5,7 +5,7 @@ public class Quote {
 	private String quote;
 	private String time;
 	
-	public Quote(String user, String type, String quote, String time)
+	public Quote(String type, String user, String quote, String time)
 	{
 		this.user = user;
 		this.type = type;
