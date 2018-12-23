@@ -56,13 +56,6 @@ public class QuoteBot extends TelegramLongPollingBot {
 			System.out.println("Could not read or locate a valid config file.");
 			e.printStackTrace();
 		}
-		
-		/*System.out.println(user);
-		System.out.println(token);
-		System.out.println(statusmsg);
-		System.out.println(db);
-		System.out.println(dbuser);
-		System.out.println(dbpass);*/
 	}
 
 	@Override

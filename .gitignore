@@ -2,3 +2,6 @@
 /quotes/
 *.class
 /target/
+/.settings/
+.classpath
+pom.xml
