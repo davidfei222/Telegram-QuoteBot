@@ -5,12 +5,12 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
 import java.util.HashMap;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class QuoteBot extends TelegramLongPollingBot {
 
@@ -23,16 +23,16 @@ public class QuoteBot extends TelegramLongPollingBot {
 	private String dbuser;
 	private String dbpass;
 	private String tables;
+	private String admins;
 
 	public QuoteBot()
 	{
 		super();
 		try {
 			// Parse the config file for things needed to run the bot.
-			// TODO: Add a help message for the bot to the config file.
 			File config = new File(configFile);
 			Scanner reader = new Scanner(config);
-			HashMap<String, String> confMap = new HashMap<String, String>(7);
+			HashMap<String, String> confMap = new HashMap<String, String>(8);
 			String line;
 			while (reader.hasNextLine()) {
 				line = reader.nextLine();
@@ -50,9 +50,10 @@ public class QuoteBot extends TelegramLongPollingBot {
 			dbuser = confMap.get("DBuser");
 			dbpass = confMap.get("DBpass");
 			tables = confMap.get("Tables");
+			admins = confMap.get("Admins");
 			reader.close();
 		} catch(FileNotFoundException e) {
-			System.out.println("Could not read or locate the config file.");
+			System.out.println("Could not read or locate a valid config file.");
 			e.printStackTrace();
 		}
 		
@@ -89,38 +90,32 @@ public class QuoteBot extends TelegramLongPollingBot {
 		//System.out.println(time);
 		// Split the message into its components for later commands
 		String[] pieces = message.split(" ", 4);
-
-		// Check for if the bot is alive.
-		if (message.toLowerCase().equals("hi bot"))
-		{
-			SendMessage status = new SendMessage()
-                    .setChatId(update.getMessage().getChatId())
-                    .setText(statusmsg + "  Type !help for more information on how to use me.");
-			try {
-				execute(status); // Call method to send the message
-				System.out.println("Status message sent out at " + LocalDateTime.now());
-			} catch (TelegramApiException e) {
-				e.printStackTrace();
-			}
-		}
 		
 		// A help message for the bot.  This describes how to format commands to the bot and
 		// what types of categories people can store quotes as (from the Tables variable).
 		if (message.toLowerCase().equals("!help")) {
-			SendMessage help = new SendMessage()
-                    .setChatId(update.getMessage().getChatId())
-                    .setText("To add a quote to the database, send a message to the group containing "
-                    		+ "the bot with the following format (without the <> brackets):\n"
-                    		+ "!add <type of quote> <name of quotee> <\"the quote itself\">\n\n"
-                    		+ "You can also private message quotes to the bot using the above command."
-                    		+ "I can currently store the following types of quotes:\n"
-                    		+ tables + "\n\n"
-                    		+ "To request the records for a type of quote, type the following "
-                    		+ "without the <> brackets:\n"
-                    		+ "!dump <type of quote>\n");
+			sendHelpMessage(update);
+		}
+		// Add a quote to the db
+		else if (pieces[0].equals("!add")) {
+			// Validate command for correct format 
+			
+			// Quote(String user, String type, String quote, String timestamp)
+			Quote item = new Quote(pieces[1], pieces[2], pieces[3], time);
+			addQuote(item);
+		}
+		else if (pieces[0].equals("!dump")) {
+			// Validate table exists
+			// Send message with a file attached to it
+		}
+		// Respond with a status message if none of the valid commands are used.
+		else {
+			SendMessage status = new SendMessage()
+					.setChatId(update.getMessage().getChatId())
+					.setText(statusmsg + "\nType !help for more information on how to use me.");
 			try {
-				execute(help); // Call method to send the message
-				System.out.println("Help message sent out at " + LocalDateTime.now());
+				execute(status); // Call method to send the message
+				System.out.println("Status message sent out at " + LocalDateTime.now());
 			} catch (TelegramApiException e) {
 				e.printStackTrace();
 			}
@@ -130,15 +125,6 @@ public class QuoteBot extends TelegramLongPollingBot {
 		if (t_user.getId() == 275215669) {
 			// TODO: Implement special commands that only I can use
 		}
-		
-		// Add a quote to the db
-		if (pieces[0].equals("!add")) {
-			// Commands should be formatted based on the help message.
-			// Quote(String user, String type, String quote, String timestamp)
-			Quote item = new Quote(pieces[1], pieces[2], pieces[3], time);
-			addQuote(item);
-		}
-		
 	}
 	
 	/*
@@ -147,7 +133,30 @@ public class QuoteBot extends TelegramLongPollingBot {
 	private void addQuote(Quote quote)
 	{
 		// TODO: Implement writing quotes to the database
-		// System.out.println(quote.getType() + "\n" + quote.getUser() + "\n" + quote.getQuote() + "\n" + quote.getTime());
+		System.out.println(quote.getType() + "\n" + quote.getUser() + "\n" + quote.getQuote() + "\n" + quote.getTime());
+	}
+	
+	/*
+	 * Send a message containing a help message when !help or incorrect command.
+	 */
+	private void sendHelpMessage(Update update)
+	{
+		SendMessage help = new SendMessage()
+                .setChatId(update.getMessage().getChatId())
+                .setText("To add a quote to the database, send a private message to the bot "
+                		+ "with the following format (without the <> brackets):\n"
+                		+ "!add <type of quote> <name of person being quoted> <\"the quote itself\">\n\n"
+                		+ "I can currently store the following types of quotes:\n"
+                		+ tables + "\n\n"
+                		+ "To request the records for a type of quote, use the following command "
+                		+ "(this will only work if you are defined as an admin user):\n"
+                		+ "!dump <type of quote>\n");
+		try {
+			execute(help); // Call method to send the message
+			System.out.println("Help message sent out at " + LocalDateTime.now());
+		} catch (TelegramApiException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

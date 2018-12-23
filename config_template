@@ -13,4 +13,6 @@ DBpass:
 # A list of possible tables to store quotes in.  This allows the owner to use multiple different tables in the MySQL database
 # for storing different categories of quotes, and will be displayed in the help message so users can know which types of quotes
 # they can specify for storage.
-Tables: 
+Tables:
+# A list of admin user IDs who have access to privileged commands such as !dump
+Admins:
