@@ -188,5 +188,4 @@ public class QuoteBot extends TelegramLongPollingBot {
 	{
 		return token;
 	}
-
 }
