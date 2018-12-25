@@ -93,7 +93,6 @@ public class QuoteBot extends TelegramLongPollingBot {
 		// Date wants the timestamp in milliseconds, but Telegram provides it in seconds so
 		// we have to multiply it by 1000.
 		String time = fmt.format(new Date(ts*1000)); 
-		//System.out.println(time);
 		// Split the message into its components for later commands
 		String[] pieces = message.split(" ", 4);
 		
@@ -119,8 +118,11 @@ public class QuoteBot extends TelegramLongPollingBot {
 			}
 		}
 		else if (pieces[0].equals("!dump")) {
-			// Validate table exists and user ID has admin rights
-			if (arrayContains(tables, pieces[1]) && arrayContains(admins, t_user.getId().toString())) {
+			// Validate correct format, table exists and user ID has admin rights
+			if (pieces.length == 2 &&
+				arrayContains(tables, pieces[1]) && 
+				arrayContains(admins, t_user.getId().toString())) 
+			{
 				// Send message with a file containing all quotes from table
 			}
 			else {
@@ -131,11 +133,6 @@ public class QuoteBot extends TelegramLongPollingBot {
 		else {
 			sendMessage(chatId, statusmsg + "\nType !help for more information on how to use me.");
 		}
-		
-		// Personal commands for my own use.
-		if (t_user.getId() == 275215669) {
-			// TODO: Implement special commands that only I can use
-		}
 	}
 	
 	/*
@@ -144,7 +141,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 	private void addQuote(Quote quote)
 	{
 		// TODO: Implement writing quotes to the database
-		System.out.println(quote.getType() + "\n" + quote.getUser() + "\n" + quote.getQuote() + "\n" + quote.getTime());
+		System.out.println(quote.getType() + "\n" + quote.getName() + "\n" + quote.getQuote() + "\n" + quote.getTime());
 	}
 	
 	/*

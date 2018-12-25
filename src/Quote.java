@@ -1,21 +1,21 @@
 // A class to represent a quote and its metadata
 public class Quote {
-	private String user;
+	private String name;
 	private String type;
 	private String quote;
 	private String time;
 	
-	public Quote(String type, String user, String quote, String time)
+	public Quote(String type, String name, String quote, String time)
 	{
-		this.user = user;
+		this.name = name;
 		this.type = type;
 		this.quote = quote;
 		this.time = time;
 	}
 	
-	public String getUser()
+	public String getName()
 	{
-		return user;
+		return name;
 	}
 	
 	public String getType()
