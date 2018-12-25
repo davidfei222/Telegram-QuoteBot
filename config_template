@@ -6,13 +6,9 @@ Token:
 # A custom status message, to allow users to ping the bot and see if it's alive.
 # You may use escape sequences such as \n to break up the text into multiple lines.
 StatusMessage: 
-# Information needed to connect to the MySQL database.
-DB: 
-DBuser: 
-DBpass: 
-# A list of possible tables to store quotes in.  This allows the owner to use multiple different tables in the MySQL database
-# for storing different categories of quotes, and will be displayed in the help message so users can know which types of quotes
-# they can specify for storage.
-Tables:
-# A list of admin user IDs who have access to privileged commands such as !dump
+# The table that this bot will store quotes in.
+Table:
+# A customizable name for the quotes (set to "Quote" by default).
+ItemName: Quote
+# A list of admin user IDs who have access to privileged commands such as !dump.
 Admins:

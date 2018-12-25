@@ -1,11 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
-import java.util.HashMap;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -20,10 +18,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 	private String user;
 	private String token;
 	private String statusmsg;
-	private String db;
-	private String dbuser;
-	private String dbpass;
-	private String[] tables;
+	private String itemName;
 	private String[] admins;
 
 	public QuoteBot()
@@ -33,9 +28,10 @@ public class QuoteBot extends TelegramLongPollingBot {
 			// Parse the config file for things needed to run the bot.
 			File config = new File(configFile);
 			Scanner reader = new Scanner(config);
-			HashMap<String, String> confMap = new HashMap<String, String>(8);
+			String[] confList = new String[5];
 			String line;
 			
+			int i = 0;
 			while (reader.hasNextLine()) {
 				line = reader.nextLine();
 				// Skip any lines that are comments or empty lines
@@ -43,20 +39,15 @@ public class QuoteBot extends TelegramLongPollingBot {
 					continue;
 				}
 				String[] pair = line.split(":", 2);
-				confMap.put(pair[0].trim(), pair[1].trim());
+				confList[i] = pair[1];
+				i++;
 			}
 			
-			user = confMap.get("User");
-			token = confMap.get("Token");
-			statusmsg = confMap.get("StatusMessage");
-			db = confMap.get("DB");
-			dbuser = confMap.get("DBuser");
-			dbpass = confMap.get("DBpass");
-			
-			String tablesstr = confMap.get("Tables");
-			tables = tablesstr.split(",");
-			
-			String adminstr = confMap.get("Admins");
+			user = confList[0].trim();
+			token = confList[1].trim();
+			statusmsg = confList[2].trim();
+			itemName = confList[3].trim();
+			String adminstr = confList[4].trim();
 			admins = adminstr.split(",");
 			
 			reader.close();
@@ -104,13 +95,12 @@ public class QuoteBot extends TelegramLongPollingBot {
 		// Add a quote to the db
 		else if (pieces[0].equals("!add")) {
 			// Validate command for correct format 
-			if (pieces.length == 4 && 
-				pieces[3].trim().matches("^\".*\"$") &&
-				arrayContains(tables, pieces[1])) 
+			if (pieces.length == 3 && 
+				pieces[2].trim().matches("^\".*\"$")) 
 			{
 				// Construct object and add to database
 				// Quote(String user, String type, String quote, String timestamp)
-				Quote item = new Quote(pieces[1], pieces[2], pieces[3], time);
+				Quote item = new Quote(pieces[1], pieces[2], time);
 				addQuote(item);
 			}
 			else {
@@ -118,11 +108,8 @@ public class QuoteBot extends TelegramLongPollingBot {
 			}
 		}
 		else if (pieces[0].equals("!dump")) {
-			// Validate correct format, table exists and user ID has admin rights
-			if (pieces.length == 2 &&
-				arrayContains(tables, pieces[1]) && 
-				arrayContains(admins, t_user.getId().toString())) 
-			{
+			// Validate user ID has admin rights
+			if (arrayContains(admins, t_user.getId().toString())) {
 				// Send message with a file containing all quotes from table
 			}
 			else {
@@ -141,7 +128,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 	private void addQuote(Quote quote)
 	{
 		// TODO: Implement writing quotes to the database
-		System.out.println(quote.getType() + "\n" + quote.getName() + "\n" + quote.getQuote() + "\n" + quote.getTime());
+		System.out.println(quote.getName() + "\n" + quote.getQuote() + "\n" + quote.getTime());
 	}
 	
 	/*
@@ -181,14 +168,12 @@ public class QuoteBot extends TelegramLongPollingBot {
 	 */
 	private void sendHelpMsg(long chatID)
 	{
-		String msg = "To add a quote to the database, send a private message to the bot "
+		String msg = "To add a/an " + itemName + " to the database, send a private message to the bot "
         	+ "with the following format (without the <> brackets):\n"
-        	+ "!add <type of quote> <name of person being quoted> <\"the quote itself\">\n\n"
-        	+ "The following types of quotes can be filled in for <type of quote>:\n"
-        	+ Arrays.toString(tables) + "\n\n"
-        	+ "To request the records for a type of quote, use the following command "
+        	+ "!add <name of person being quoted> <\"the " + itemName + " itself\">\n\n"
+        	+ "To request " + itemName + " records, use the following command "
         	+ "(this will only work if you are defined as an admin user):\n"
-        	+ "!dump <type of quote>\n";
+        	+ "!dump\n";
 		sendMessage(chatID, msg);
 	}
 
