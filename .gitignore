@@ -4,5 +4,6 @@
 /target/
 /.settings/
 .classpath
-pom.xml
 .project
+hibernate.cfg.xml
+Quote.hbm.xml

@@ -2,7 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Scanner;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -20,6 +20,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 	private String statusmsg;
 	private String itemName;
 	private String[] admins;
+	private QuoteRepository repo;
 
 	public QuoteBot()
 	{
@@ -51,10 +52,13 @@ public class QuoteBot extends TelegramLongPollingBot {
 			admins = adminstr.split(",");
 			
 			reader.close();
+			
 		} catch(FileNotFoundException e) {
 			System.out.println("Could not read or locate a valid config file.");
 			e.printStackTrace();
 		}
+		
+		repo = new QuoteRepository();
 	}
 
 	@Override
@@ -79,11 +83,9 @@ public class QuoteBot extends TelegramLongPollingBot {
 			return;
 		}
 		
-		// Convert the unix timestamp of the message to appropriate format
-		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		// Date wants the timestamp in milliseconds, but Telegram provides it in seconds so
 		// we have to multiply it by 1000.
-		String time = fmt.format(new Date(ts*1000)); 
+		Date time = new Date(ts*1000); 
 		// Split the message into its components for later commands
 		String[] pieces = message.split(" ", 4);
 		
@@ -100,8 +102,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 			{
 				// Construct object and add to database
 				// Quote(String user, String type, String quote, String timestamp)
-				Quote item = new Quote(pieces[1], pieces[2], time);
-				addQuote(item);
+				repo.addQuote(pieces[1], pieces[2], time);
 			}
 			else {
 				sendHelpMsg(chatId);
@@ -111,6 +112,12 @@ public class QuoteBot extends TelegramLongPollingBot {
 			// Validate user ID has admin rights
 			if (arrayContains(admins, t_user.getId().toString())) {
 				// Send message with a file containing all quotes from table
+				List<Quote> quotes = repo.readQuotes();
+				for (int i = 0; i < quotes.size(); i++) {
+					Quote qt = quotes.get(i);
+					System.out.println(qt.getQuote());
+					System.out.println("    -" + qt.getName());
+				}
 			}
 			else {
 				sendHelpMsg(chatId);
@@ -120,15 +127,6 @@ public class QuoteBot extends TelegramLongPollingBot {
 		else {
 			sendMessage(chatId, statusmsg + "\nType !help for more information on how to use me.");
 		}
-	}
-	
-	/*
-	 * Add a quote sent by a group member to the appropriate database.
-	 */
-	private void addQuote(Quote quote)
-	{
-		// TODO: Implement writing quotes to the database
-		System.out.println(quote.getName() + "\n" + quote.getQuote() + "\n" + quote.getTime());
 	}
 	
 	/*
