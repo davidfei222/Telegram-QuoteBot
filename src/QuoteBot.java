@@ -87,7 +87,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 		// we have to multiply it by 1000.
 		Date time = new Date(ts*1000); 
 		// Split the message into its components for later commands
-		String[] pieces = message.split(" ", 4);
+		String[] pieces = message.split(" ", 3);
 		
 		// A help message for the bot.  This describes how to format commands to the bot and
 		// what types of categories people can store quotes as (from the Tables variable).
