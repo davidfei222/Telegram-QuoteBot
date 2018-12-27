@@ -11,6 +11,12 @@ else
 	cp ./config_template $config
 fi
 
+if [ -n "$1" ] && [ $1 = 'run' ]; then
+	echo "Compiling and running bot..."
+	mvn clean install
+	mvn exec:java -Dexec.mainClass="Main"
+fi
+
 #echo "Compiling code for the bot..."
 #cd "$HOME/Documents/GitHub/Telegram-QuoteBot/src"
 #javac -cp "$HOME/Documents/GitHub/Telegram-QuoteBot/lib/telegrambots-3.6-jar-with-dependencies.jar":. Main.java

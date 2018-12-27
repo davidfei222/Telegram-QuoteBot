@@ -7,6 +7,8 @@ public class Quote {
 	private String Quote;
 	private Date Date;
 	
+	public Quote() {}
+	
 	public Quote(String name, String quote, Date time)
 	{
 		this.Name = name;

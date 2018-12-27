@@ -102,7 +102,10 @@ public class QuoteBot extends TelegramLongPollingBot {
 			{
 				// Construct object and add to database
 				// Quote(String user, String type, String quote, String timestamp)
-				repo.addQuote(pieces[1], pieces[2], time);
+				int id = repo.addQuote(pieces[1], pieces[2], time);
+				if (id > 0) {
+					sendMessage(chatId, "Successfully saved " + itemName + ".");
+				}
 			}
 			else {
 				sendHelpMsg(chatId);
@@ -120,7 +123,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 				}
 			}
 			else {
-				sendHelpMsg(chatId);
+				sendMessage(chatId, "You do not have admin rights, command not executed.");
 			}
 		}
 		// Respond with a status message if none of the valid commands are used.

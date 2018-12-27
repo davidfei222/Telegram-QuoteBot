@@ -6,8 +6,6 @@ Token:
 # A custom status message, to allow users to ping the bot and see if it's alive.
 # You may use escape sequences such as \n to break up the text into multiple lines.
 StatusMessage: 
-# The table that this bot will store quotes in.
-Table:
 # A customizable name for the quotes (set to "Quote" by default).
 ItemName: Quote
 # A list of admin user IDs who have access to privileged commands such as !dump.
