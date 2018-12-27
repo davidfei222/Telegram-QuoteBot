@@ -6,4 +6,4 @@
 .classpath
 .project
 hibernate.cfg.xml
-Quote.hbm.xml
+*.hbm.xml
