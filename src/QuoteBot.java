@@ -3,15 +3,18 @@ import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+
+import org.apache.shiro.session.Session;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.session.TelegramLongPollingSessionBot;
 
-public class QuoteBot extends TelegramLongPollingBot {
+public class QuoteBot extends TelegramLongPollingSessionBot {
 
 	// Configuration variables
 	private static String configFile = System.getenv("HOME") + "/.Telegram-QuoteBot/config";
@@ -62,7 +65,7 @@ public class QuoteBot extends TelegramLongPollingBot {
 	}
 
 	@Override
-	public void onUpdateReceived(Update update)
+	public void onUpdateReceived(Update update, Optional<Session> optionalSession)
 	{
 		System.out.println("Update received at " + LocalDateTime.now());
 		

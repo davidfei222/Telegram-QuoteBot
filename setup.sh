@@ -13,8 +13,7 @@ fi
 
 if [ -n "$1" ] && [ $1 = 'run' ]; then
 	echo "Compiling and running bot..."
-	mvn clean install
-	mvn exec:java -Dexec.mainClass="Main"
+	mvn clean install && mvn exec:java -Dexec.mainClass="Main"
 fi
 
 #echo "Compiling code for the bot..."
