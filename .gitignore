@@ -1,5 +1,5 @@
 /bin/
-/quotes/
+quotes.txt
 *.class
 /target/
 /.settings/

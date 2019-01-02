@@ -1,5 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -92,6 +97,15 @@ public class QuoteBot extends TelegramLongPollingSessionBot {
 		// we have to multiply it by 1000.
 		Date time = new Date(ts*1000); 
 		
+		// Prevent the use of this bot from a group chat
+		if (!messageObj.getChat().isUserChat()) {
+			if (message.matches("@" + user)) {
+				sendMessage(chatId, "The use of this bot is restricted to DMs, to add a/an " + itemName
+						+ " please send a direct message to @" + user);
+			}
+			return;
+		}
+		
 		// Determine if this user is currently in the middle of an action
 		Session sess;
 		if ((sess = optionalSession.get()).getAttribute("ActionSeq") != null) {
@@ -174,12 +188,24 @@ public class QuoteBot extends TelegramLongPollingSessionBot {
 	{
 		// Validate user ID has admin rights
 		if (arrayContains(admins, user.getId().toString())) {
-			// TODO: Send message with a file containing all quotes from table
+			// Send message with a file containing all quotes from table
 			List<Quote> quotes = repo.readQuotes();
 			for (int i = 0; i < quotes.size(); i++) {
 				Quote qt = quotes.get(i);
-				System.out.println("\"" + qt.getQuote() + "\"");
-				System.out.println("    -" + qt.getName() + "\n");
+				String quote = "\"" + qt.getQuote() + "\"\n    -" + qt.getName() + "\n\n";
+				try {
+					Files.write(Paths.get(itemName + "s.txt"), quote.getBytes(StandardCharsets.UTF_8),
+							StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			sendDoc(chatId, itemName + "s.txt");
+			// Delete the file when finished to save space on disk
+			try {
+				Files.delete(Paths.get(itemName + "s.txt"));
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		else {
