@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Scanner;
 
 import org.apache.shiro.session.Session;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -203,16 +204,34 @@ public class QuoteBot extends TelegramLongPollingSessionBot {
 	}
 	
 	/*
-	 * Send a message in response to an update
+	 * Send a message to the user
 	 */
 	private void sendMessage(long chatID, String str)
 	{
-		SendMessage help = new SendMessage()
-                .setChatId(chatID)
-                .setText(str);
+		SendMessage msg = new SendMessage();
+		msg.setChatId(chatID);
+		msg.setText(str);
+		
 		try {
-			execute(help);
+			execute(msg);
 			System.out.println("Message sent out at " + LocalDateTime.now());
+		} catch (TelegramApiException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/*
+	 * Send a document to the user
+	 */
+	private void sendDoc(long chatId, String filePath)
+	{
+		SendDocument doc = new SendDocument();
+		doc.setChatId(chatId);
+		doc.setDocument(new File(filePath));
+		
+		try {
+			execute(doc);
+			System.out.println("Dump file sent out at " + LocalDateTime.now());
 		} catch (TelegramApiException e) {
 			e.printStackTrace();
 		}
