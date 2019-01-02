@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.session.DefaultChatIdConverter;
 import org.telegram.telegrambots.session.TelegramLongPollingSessionBot;
 
 public class QuoteBot extends TelegramLongPollingSessionBot {
@@ -27,7 +28,8 @@ public class QuoteBot extends TelegramLongPollingSessionBot {
 
 	public QuoteBot()
 	{
-		super();
+		super(new DefaultChatIdConverter());
+		
 		try {
 			// Parse the config file for things needed to run the bot.
 			File config = new File(configFile);
@@ -54,8 +56,7 @@ public class QuoteBot extends TelegramLongPollingSessionBot {
 			String adminstr = confList[4].trim();
 			admins = adminstr.split(",");
 			
-			reader.close();
-			
+			reader.close();		
 		} catch(FileNotFoundException e) {
 			System.out.println("Could not read or locate a valid config file.");
 			e.printStackTrace();
@@ -89,49 +90,99 @@ public class QuoteBot extends TelegramLongPollingSessionBot {
 		// Date wants the timestamp in milliseconds, but Telegram provides it in seconds so
 		// we have to multiply it by 1000.
 		Date time = new Date(ts*1000); 
-		// Split the message into its components for later commands
-		String[] pieces = message.split(" ", 3);
 		
-		// A help message for the bot.  This describes how to format commands to the bot and
-		// what types of categories people can store quotes as (from the Tables variable).
-		if (message.toLowerCase().equals("!help")) {
-			sendHelpMsg(chatId);
-		}
-		// Add a quote to the db
-		else if (pieces[0].equals("!add")) {
-			// Validate command for correct format 
-			if (pieces.length == 3 && 
-				pieces[2].trim().matches("^\".*\"$")) 
-			{
-				// Construct object and add to database
-				// Quote(String user, String type, String quote, String timestamp)
-				int id = repo.addQuote(pieces[1], pieces[2], time);
-				if (id > 0) {
-					sendMessage(chatId, "Successfully saved " + itemName + ".");
-				}
+		// Determine if this user is currently in the middle of an action
+		Session sess;
+		if ((sess = optionalSession.get()).getAttribute("ActionSeq") != null) {
+			String currAction = (String)sess.getAttribute("ActionSeq");
+			boolean isEnded = false;
+			switch (currAction) {
+			case "!add":
+				isEnded = addActionSeq(sess, message, chatId);
+				break;
+			default:
+				System.err.println("An unrecognized action sequence " + currAction + "is being used.");
+				break;
 			}
-			else {
-				sendHelpMsg(chatId);
+			// Stop and clear the session if the action has finished (the library will create a fresh one
+			// when it receives the next update).
+			if (isEnded) {
+				sess.stop();
 			}
 		}
-		else if (pieces[0].equals("!dump")) {
-			// Validate user ID has admin rights
-			if (arrayContains(admins, t_user.getId().toString())) {
-				// Send message with a file containing all quotes from table
-				List<Quote> quotes = repo.readQuotes();
-				for (int i = 0; i < quotes.size(); i++) {
-					Quote qt = quotes.get(i);
-					System.out.println(qt.getQuote());
-					System.out.println("    -" + qt.getName());
-				}
-			}
-			else {
-				sendMessage(chatId, "You do not have admin rights, command not executed.");
-			}
-		}
-		// Respond with a status message if none of the valid commands are used.
+		// If not, start an action sequence or handle single message commands
 		else {
-			sendMessage(chatId, statusmsg + "\nType !help for more information on how to use me.");
+			switch (message) {
+			case "!help":
+				sendHelpMsg(chatId);
+				break;
+			case "!add":
+				optionalSession.get().setAttribute("ActionSeq", message);
+				optionalSession.get().setAttribute("ActionDate", time);
+				addActionSeq(optionalSession.get(), message, chatId);
+				break;
+			case "!dump":
+				dumpAction(chatId, t_user);
+				break;
+			default:
+				sendMessage(chatId, statusmsg + "\nType !help for more information on how to use me.");
+				break;
+			}
+		}
+	}
+	
+	/*
+	 * Handle a session for creating and adding a new quote to the db.
+	 * 
+	 * Returns true or false to indicate whether it is safe to terminate the session.
+	 */
+	private boolean addActionSeq(Session sess, String msg, long chatId)
+	{
+		if (sess.getAttribute("LastAction") == null) {
+			sendMessage(chatId, "Tell me who said this " + itemName + ".");
+			sess.setAttribute("LastAction", "Ask for quotee");
+		}
+		else if (((String)sess.getAttribute("LastAction")).equals("Ask for quotee")) {
+			// If the bot just asked for the quotee, then save the response as such.
+			sess.setAttribute("Quotee", msg);
+			sendMessage(chatId, "Now tell me what they said.");
+			sess.setAttribute("LastAction", "Ask for quote");
+		}
+		else if (((String)sess.getAttribute("LastAction")).equals("Ask for quote")) {
+			// If the bot just asked for the quote, then this session has all the info 
+			// it needs and can write the item to the database.
+			int id = repo.addQuote((String)sess.getAttribute("Quotee"), msg, 
+					(Date)sess.getAttribute("ActionDate"));
+			if (id > 0) {
+				sendMessage(chatId, "Successfully saved " + itemName + ".");
+			}
+			else {
+				sendMessage(chatId, "Failed to save " + itemName + " due to problems with the database.");
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	/*
+	 * The action triggered when the user asks for a dump (no sequence necessary).
+	 * 
+	 * Retrieves all items from the db and writes them to a file that can be read easily by humans.
+	 */
+	private void dumpAction(long chatId, User user)
+	{
+		// Validate user ID has admin rights
+		if (arrayContains(admins, user.getId().toString())) {
+			// TODO: Send message with a file containing all quotes from table
+			List<Quote> quotes = repo.readQuotes();
+			for (int i = 0; i < quotes.size(); i++) {
+				Quote qt = quotes.get(i);
+				System.out.println("\"" + qt.getQuote() + "\"");
+				System.out.println("    -" + qt.getName() + "\n");
+			}
+		}
+		else {
+			sendMessage(chatId, "You do not have admin rights, command not executed.");
 		}
 	}
 	
@@ -169,12 +220,14 @@ public class QuoteBot extends TelegramLongPollingSessionBot {
 	
 	/*
 	 * Send a message containing a help message when !help or incorrect command.
+	 * 
+	 * The help message describes what commands can be initiated.
 	 */
 	private void sendHelpMsg(long chatID)
 	{
-		String msg = "To add a/an " + itemName + " to the database, send a private message to the bot "
-        	+ "with the following format (without the <> brackets):\n"
-        	+ "!add <name of person being quoted> <\"the " + itemName + " itself\">\n\n"
+		String msg = "To add a/an " + itemName + " to the database, send a message "
+			+ "to the bot containing this command:\n"
+			+ "!add\n\n"
         	+ "To request " + itemName + " records, use the following command "
         	+ "(this will only work if you are defined as an admin user):\n"
         	+ "!dump\n";
