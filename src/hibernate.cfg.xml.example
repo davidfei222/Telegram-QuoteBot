@@ -3,33 +3,16 @@
 "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
 	<session-factory>
-		<property name = "hibernate.dialect">
-			org.hibernate.dialect.MySQLDialect
-		</property>
-		
-		<property name = "hibernate.connection.driver_class">
-			com.mysql.cj.jdbc.Driver
-		</property>
-		
-		<property name = "hibernate.connection.url">
-			jdbc:mysql://localhost/database
-		</property>
-		
-		<property name = "hibernate.connection.username">
-			user
-		</property>
-		
-		<property name = "hibernate.connection.password">
-			password
-		</property>
+		<property name = "hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+		<property name = "hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+		<property name = "hibernate.connection.url">jdbc:mysql://localhost/database</property>
+		<property name = "hibernate.connection.username">user</property>
+		<property name = "hibernate.connection.password">password</property>
+		<property name = "hibernate.agroal.maxSize">100</property>
 
-		<property name = "hibernate.connection.pool_size">
-			1
-		</property>
-
-		<property name = "hibernate.agroal.maxSize">
-			100
-		</property>
+		<property name="connection.autoReconnect">true</property>
+		<property name="connection.autoReconnectForPools">true</property>
+		<property name="connection.is-connection-validation-required">true</property>
 
 		<!-- List of XML mapping files -->
 		<mapping resource = "Quote.hbm.xml"/>
