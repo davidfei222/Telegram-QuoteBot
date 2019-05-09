@@ -11,6 +11,9 @@ import org.hibernate.cfg.Configuration;
 public class QuoteRepository {
 	private SessionFactory sessFact;
 	
+	/*
+	 * This object handles queries to the database.
+	 */
 	public QuoteRepository()
 	{
 		try {
